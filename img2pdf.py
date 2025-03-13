@@ -12,7 +12,6 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 import pathlib
-import easyocr
 import os
 import argparse
 import PIL
@@ -27,7 +26,7 @@ from PIL import __version__ as PILLOW_VERSION
 
 print(f"Pillow version: {PILLOW_VERSION}")
 
-_reader = easyocr.Reader(['sv', 'en'], model_storage_directory=pathlib.Path('./model').resolve())
+_reader = None
 
 try:
     pdfmetrics.registerFont(TTFont('ArialUnicodeMS', 'arial-unicode-ms.ttf')) 
@@ -54,6 +53,9 @@ def combine_pdfs(pdf_files, output_path):
 
 def draw_bounds_before_process(img_path, output_dir):
     global _reader
+    if _reader is None:
+        from easyocr import Reader
+        _reader = Reader(['sv', 'en'], model_storage_directory=pathlib.Path('./model').resolve())
 
     try:
         image = Image.open(img_path, exif=None).convert('RGB')
@@ -96,6 +98,10 @@ def draw_bounds_before_process(img_path, output_dir):
 def img_to_pdf(img_path, output_dir):
     global _reader
 
+    if _reader is None:
+        from easyocr import Reader
+        _reader = Reader(['sv', 'en'], model_storage_directory=pathlib.Path('./model').resolve())
+
     try:
         image_pil = Image.open(img_path, exif=None)
     except TypeError:
@@ -118,7 +124,10 @@ def img_to_pdf(img_path, output_dir):
         for (bbox, text, prob) in results:
             f.write(text.encode("utf-8").decode('utf-8') + '\n')
     
-    names = extract_key_details(results)
+    # Pass the text results to the name extraction function
+    texts = [text for (bbox, text, prob) in results]
+    names = extract_key_details(texts)
+    
     print(f"Names detected: {names}")
 
     with open(file=os.path.join(output_dir, 'names.txt'), mode='w', encoding="utf-8") as f:
@@ -189,7 +198,7 @@ def is_name(text) -> bool:
 def includes_year(string):
     return re.search(r'\b\d{4}\b', string) is not None
 
-def extract_key_details(results) -> list[str]:
+def extract_key_details(results: list[str]) -> list[str]:
     strategies = [
         includes_acronym,
         includes_hyphenated_name,
@@ -226,14 +235,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.test_name_detect:
-        with open(args.test_name_detect, 'r') as f:
-            text = f.read()
-            results = _reader.readtext(text)
-            names = extract_key_details(results)
-            
+        path = pathlib.Path(args.test_name_detect)
+        with open(path, 'r') as f:
+            texts = f.read().encode("utf-8").decode('utf-8').splitlines()
+            names = extract_key_details(texts)
             print(f"Names detected: {names}")
-
-    if args.image_path:
-        img_to_pdf(args.image_path, args.output_dir)
-    elif args.image_dir:
-        process_directory(args.image_dir, args.output_dir)
+    else:
+        if args.image_path:
+            img_to_pdf(args.image_path, args.output_dir)
+        elif args.image_dir:
+            process_directory(args.image_dir, args.output_dir)
