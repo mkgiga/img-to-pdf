@@ -1,0 +1,5 @@
+# dependencies
+easyocr
+reportlab
+PyPDF2
+nltk

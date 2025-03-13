@@ -1,0 +1,16 @@
+
+.DS_Store
+.vscode/
+__pycache__/
+
+output/*
+input/*
+model/*
+logs/*
+data/*
+venv/
+dist/
+banner_logo.png
+*.spec
+*.log
+*.pyc
