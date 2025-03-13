@@ -177,72 +177,6 @@ def includes_acronym(string):
 def includes_hyphenated_name(string):
     return re.search(r'\b[A-ZÅÄÖ][a-zåäö]+-[A-ZÅÄÖ][a-zåäö]+\b', string) is not None
 
-def is_date(string):
-    
-    word_format = [
-        "första",
-        "andra",
-        "tredje",
-        "fjärde",
-        "femte",
-        "sjätte",
-        "sjunde",
-        "åttonde",
-        "nionde",
-        "tionde",
-        "elfte",
-        "tolfte",
-        "trettonde",
-        "fjortonde",
-        "femtonde",
-        "sextonde",
-        "sjuttonde",
-        "artonde",
-        "nittonde",
-        "tjugonde",
-        "tjugoförsta",
-        "tjugotredje",
-        "tjugofjärde",
-        "tjugofemte",
-        "tjugosjätte",
-        "tjugosjunde",
-        "tjugoåttonde",
-        "tjugonionde",
-        "trettionde",
-        "trettioförsta"
-        "trettiförsta",
-        "den sista",
-    ]
-
-    months_sv = [
-        "januari",
-        "februari",
-        "mars",
-        "april",
-        "maj",
-        "juni",
-        "juli",
-        "augusti",
-        "september",
-        "oktober",
-        "november",
-        "december",
-        "jan",
-        "feb",
-        "mar",
-        "apr",
-        "maj",
-        "jun",
-        "jul",
-        "aug",
-        "sep",
-        "okt",
-        "nov",
-        "dec"
-    ]
-
-    return re.search(r'\b(\d{4}-\d{2}-\d{2}|\d{2}/\d{2}/\d{4}|\d{2}\.\d{2}\.\d{4}|\d{2} \w+ \d{4}|\d{2} \w+|\d{2}/\d{2}|\d{2}\.\d{2}|\b|\b'.join(word_format) + r'\b', string) is not None or re.search(r'\b\d{1,2} \w+ \d{4}\b', string) is not None
-
 def is_name(text) -> bool:
         
         without_special_chars = ''.join([c for c in text if c.isalnum() or c in 'åäö-'])
@@ -260,7 +194,6 @@ def extract_key_details(results) -> list[str]:
         includes_acronym,
         includes_hyphenated_name,
         includes_year,
-        is_date,
         is_name,
     ]
 
