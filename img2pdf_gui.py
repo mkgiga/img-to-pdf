@@ -22,12 +22,7 @@ class Img2PdfGUI:
         
         # Load translations
         self.translations = self.load_translations("translations.json") # Load from JSON file
-        self.current_language = "sv" # Default language
-
-        # Banner logo
-        self.banner_image = tk.PhotoImage(file="banner_logo.png")
-        self.banner_label = ttk.Label(root, image=self.banner_image)
-        self.banner_label.pack(pady=24, side=tk.TOP, fill="none", expand=False, padx=24, anchor="w")
+        self.current_language = "en" # Default language
 
         # Create notebook (tabs)
         self.notebook = ttk.Notebook(root)
